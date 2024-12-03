@@ -1,5 +1,17 @@
 <template>
   <div>
+    <q-btn
+      label="가입자만 가능한 엑셀 다운로드"
+      color="primary"
+      icon="download"
+      class="q-mt-md"
+      @click="openDialog"
+    />
+  </div>
+
+  <XlsxDialog v-model="dialog" :target-date="targetDate" />
+
+  <div class="q-mt-lg">
     <!-- 비디오 리스트 -->
     <div v-if="videos.length > 0" class="row q-col-gutter-lg">
       <div v-for="(video, idx) in videos" :key="video.id" class="col-6">
@@ -34,6 +46,7 @@ import type { VideoRes } from '~/types/VideoRes'
 import { fetchVideosFromApi } from '~/services/fetchData'
 import { date } from 'quasar'
 import { useRoute } from '#app'
+import XlsxDialog from '~/components/dialog/XlsxDialog.vue'
 
 // 상태 관리
 const videos = ref<VideoRes[]>([]) // 비디오 데이터
@@ -108,6 +121,11 @@ const showNotification = () => {
 onMounted(() => {
   fetchMoreVideos()
 })
+
+const dialog = ref(false)
+const openDialog = () => {
+  dialog.value = true
+}
 </script>
 
 <style scoped>

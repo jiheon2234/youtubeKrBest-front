@@ -67,3 +67,34 @@ export const fetchComments = async (
     )
   }
 }
+
+export const fetchCloudfrontSignedURL = async (
+  targetDate: string,
+): Promise<string> => {
+  const dateRegex = /^\d{4}-\d{2}-\d{2}$/
+  if (!dateRegex.test(targetDate)) {
+    throw new Error('targetDate must be in yyyy-mm-dd format')
+  }
+
+  try {
+    const response = await fetch(
+      `http://localhost:8080/api/video-report?targetDate=${encodeURIComponent(targetDate)}`,
+    )
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(
+        errorData.message || `HTTP error! status: ${response.status}`,
+      )
+    }
+
+    const signedURL = await response.text()
+    console.log(signedURL)
+    return signedURL
+  } catch (error: any) {
+    console.error('Error fetching signed URL:', error.message || error)
+    throw new Error(
+      error.message || 'Unknown error occurred while fetching signed URL',
+    )
+  }
+}
