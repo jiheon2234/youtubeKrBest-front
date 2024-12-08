@@ -33,6 +33,7 @@
             <q-chip class="q-mr-sm">#{{ tag }}</q-chip>
           </div>
         </div>
+        <div v-if="!video.tags.length"></div>
         <q-chip
           v-if="video.tags.length > 3"
           :label="`${video.tags.length - 3} more ...`"

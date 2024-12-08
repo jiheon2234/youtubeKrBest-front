@@ -22,23 +22,18 @@
 
         <q-separator dark vertical />
         <!-- <ClientOnly> -->
-        <NuxtLink v-slot="{ navigate }" custom to="/login">
-          <q-btn stretch flat label="tbd" @click="" />
+        <NuxtLink v-slot="{ navigate }" custom to="/tbd">
+          <q-btn stretch flat label="tbd" @click="signOut" />
         </NuxtLink>
-        <q-btn
-          stretch
-          flat
-          no-caps
-          label="login"
-          @click="
-            () =>
-              $q.notify({
-                message: 'Login Successful',
-                type: 'positive',
-                timeout: 2000,
-              })
-          "
-        />
+        <NuxtLink
+          v-if="!isAuthenticated"
+          v-slot="{ navigate }"
+          custom
+          to="/login"
+        >
+          <q-btn stretch flat label="login" no-caps @click="navigate()" />
+        </NuxtLink>
+        <q-btn v-else stretch flat label="logout" no-caps @click="signOut" />
         <!-- </ClientOnly> -->
       </q-toolbar>
     </q-header>
@@ -51,8 +46,14 @@
   </q-layout>
 </template>
 <script setup lang="ts">
+import { useAuthStore } from '~/stores/auth'
+
 const pageContainerStyle = computed(() => ({
   maxWidth: '1080px',
   margin: '0 auto',
 }))
+
+const authStore = useAuthStore()
+const { currentUser, isAuthenticated } = storeToRefs(authStore)
+const { signOut } = authStore
 </script>

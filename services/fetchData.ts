@@ -3,6 +3,7 @@
 import type { PagingData } from '~/types/Paging'
 import type { VideoRes } from '~/types/VideoRes'
 import type { CommentRes } from '~/types/CommentRes'
+import type { User } from '~/types/User'
 
 export const fetchVideosFromApi = async (
   targetDate: string,
@@ -96,5 +97,31 @@ export const fetchCloudfrontSignedURL = async (
     throw new Error(
       error.message || 'Unknown error occurred while fetching signed URL',
     )
+  }
+}
+
+export const getUser = async (
+  email: string,
+  password: string,
+): Promise<User> => {
+  try {
+    const res = await $fetch<User>('http://localhost:8080/api/user/sign-in', {
+      method: 'POST',
+      headers: {
+        accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: {
+        email,
+        password,
+      },
+    })
+    return res
+  } catch (error: any) {
+    console.error(error)
+    throw createError({
+      statusCode: 419,
+      statusMessage: 'something wrong: ㅠㅠ',
+    })
   }
 }
