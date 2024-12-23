@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="isAuthenticated">
     <q-btn
       label="가입자만 가능한 엑셀 다운로드"
       color="primary"
@@ -7,9 +7,18 @@
       class="q-mt-md"
       @click="openDialog"
     />
+    <XlsxDialog v-model="dialog" :target-date="targetDate" />
   </div>
 
-  <XlsxDialog v-model="dialog" :target-date="targetDate" />
+  <div v-else>
+    <NuxtLink v-if="isAuthenticated" v-slot="{ navigate }" custom to="/tbd">
+      <q-btn
+        label="가입자는 엑셀파일을 다운로드할 수 있다"
+        color="primary"
+        @click="navigate"
+      />
+    </NuxtLink>
+  </div>
 
   <div class="q-mt-lg">
     <!-- 비디오 리스트 -->
@@ -47,6 +56,9 @@ import { fetchVideosFromApi } from '~/services/fetchData'
 import { date } from 'quasar'
 import { useRoute } from '#app'
 import XlsxDialog from '~/components/dialog/XlsxDialog.vue'
+import { useAuthStore } from '~/stores/auth'
+
+const { isAuthenticated } = useAuthStore()
 
 // 상태 관리
 const videos = ref<VideoRes[]>([]) // 비디오 데이터

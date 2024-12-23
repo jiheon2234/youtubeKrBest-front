@@ -4,6 +4,8 @@ import type { PagingData } from '~/types/Paging'
 import type { VideoRes } from '~/types/VideoRes'
 import type { CommentRes } from '~/types/CommentRes'
 import type { User } from '~/types/User'
+const config = useRuntimeConfig()
+const BASEURL = config.public.apiBaseUrl || 'https://localhost:8081'
 
 export const fetchVideosFromApi = async (
   targetDate: string,
@@ -11,7 +13,7 @@ export const fetchVideosFromApi = async (
 ): Promise<PagingData<VideoRes[]>> => {
   try {
     const response = await $fetch<PagingData<VideoRes[]>>(
-      'http://localhost:8080/api/video',
+      `${BASEURL}/api/video`,
       {
         method: 'GET',
         params: {
@@ -31,12 +33,9 @@ export const fetchVideosFromApi = async (
 
 export const fetchVideoById = async (videoId: string): Promise<VideoRes> => {
   try {
-    const response = await $fetch<VideoRes>(
-      `http://localhost:8080/api/video/${videoId}`,
-      {
-        method: 'get',
-      },
-    )
+    const response = await $fetch<VideoRes>(`${BASEURL}/api/video/${videoId}`, {
+      method: 'get',
+    })
 
     return response
   } catch (error: any) {
@@ -53,7 +52,7 @@ export const fetchComments = async (
 ): Promise<PagingData<CommentRes[]>> => {
   try {
     const response = await $fetch<PagingData<CommentRes[]>>(
-      `http://localhost:8080/api/video/${videoId}/comments`,
+      `${BASEURL}/api/video/${videoId}/comments`,
       {
         params: {
           lastId: lastId,
@@ -71,6 +70,7 @@ export const fetchComments = async (
 
 export const fetchCloudfrontSignedURL = async (
   targetDate: string,
+  token: string,
 ): Promise<string> => {
   const dateRegex = /^\d{4}-\d{2}-\d{2}$/
   if (!dateRegex.test(targetDate)) {
@@ -79,7 +79,13 @@ export const fetchCloudfrontSignedURL = async (
 
   try {
     const response = await fetch(
-      `http://localhost:8080/api/video-report?targetDate=${encodeURIComponent(targetDate)}`,
+      `${BASEURL}/api/video-report?targetDate=${encodeURIComponent(targetDate)}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
     )
 
     if (!response.ok) {
@@ -105,7 +111,7 @@ export const getUser = async (
   password: string,
 ): Promise<User> => {
   try {
-    const res = await $fetch<User>('http://localhost:8080/api/user/sign-in', {
+    const res = await $fetch.raw(`${BASEURL}/api/user/sign-in`, {
       method: 'POST',
       headers: {
         accept: 'application/json',
@@ -116,12 +122,49 @@ export const getUser = async (
         password,
       },
     })
-    return res
+    const user = res._data as User
+    const token = res.headers.get('authorization')
+    if (!token) {
+      throw new Error()
+    }
+    user.token = token.substring(7)
+    return user
   } catch (error: any) {
     console.error(error)
     throw createError({
       statusCode: 419,
       statusMessage: 'something wrong: ㅠㅠ',
     })
+  }
+}
+
+export const signUp = async (
+  email: string,
+  password: string,
+  description: string,
+): Promise<void> => {
+  try {
+    const response = await fetch(`${BASEURL}/api/user/sign-up`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email,
+        password,
+        description,
+      }),
+    })
+
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status} - ${response.statusText}`)
+    }
+
+    const data = await response.json()
+
+    console.log('User successfully registered:', data)
+  } catch (error: any) {
+    console.error('Sign-in failed:', error)
+    throw new Error(error.message || '회원가입 실패')
   }
 }

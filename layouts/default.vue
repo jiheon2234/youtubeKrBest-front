@@ -22,8 +22,8 @@
 
         <q-separator dark vertical />
         <!-- <ClientOnly> -->
-        <NuxtLink v-slot="{ navigate }" custom to="/tbd">
-          <q-btn stretch flat label="tbd" @click="signOut" />
+        <NuxtLink v-if="isAuthenticated" v-slot="{ navigate }" custom to="/tbd">
+          <q-btn stretch flat :label="currentUser?.token" />
         </NuxtLink>
         <NuxtLink
           v-if="!isAuthenticated"

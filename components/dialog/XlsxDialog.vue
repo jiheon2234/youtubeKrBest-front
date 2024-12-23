@@ -36,6 +36,7 @@
 import { defineProps, ref } from 'vue'
 import { useAsyncData } from 'nuxt/app'
 import { fetchCloudfrontSignedURL } from '~/services/fetchData'
+import { useAuthStore } from '~/stores/auth'
 
 const props = defineProps<{
   modelValue: boolean
@@ -46,13 +47,15 @@ defineEmits(['update:modelValue'])
 
 // 다운로드 URL (예시로 초기값 설정 가능)
 
+const { currentUser } = useAuthStore()
+
 const {
   data: signedURL,
   execute,
   pending,
 } = await useAsyncData<string>(
   'keys',
-  () => fetchCloudfrontSignedURL(props.targetDate),
+  () => fetchCloudfrontSignedURL(props.targetDate, currentUser?.token),
   { immediate: true, default: () => 'a' },
 )
 // 파일 다운로드 함수

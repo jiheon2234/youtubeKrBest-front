@@ -2,7 +2,7 @@
   <q-form class="q-gutter-lg" @submit.prevent="handleLoginSubmit">
     <q-input v-model="form.email" filled label="email" />
 
-    <q-input v-model="form.passwowrd" filled type="password" label="password" />
+    <q-input v-model="form.password" filled type="password" label="password" />
 
     <div class="q-mt-lg">
       <q-btn
@@ -15,6 +15,7 @@
         :loading="loading"
       />
     </div>
+    <a href="/signUp">회원가입</a>
     <div v-if="error" class="q-mt-lg">
       {{ error }}
     </div>
@@ -31,7 +32,7 @@ const { signIn } = useAuthStore()
 
 const form = ref({
   email: '',
-  passwowrd: '',
+  password: '',
 })
 const error = ref<Error | null>(null)
 const loading = ref(false)
@@ -41,7 +42,7 @@ const handleLoginSubmit = async () => {
     error.value = null
     loading.value = true
 
-    await signIn(form.value.email, form.value.passwowrd)
+    await signIn(form.value.email, form.value.password)
     emit('success')
   } catch (err: unknown) {
     debugger
