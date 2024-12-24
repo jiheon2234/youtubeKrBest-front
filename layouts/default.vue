@@ -15,15 +15,15 @@
         <q-separator dark vertical />
         <!--        <q-btn stretch flat no-caps @click="moveYoutube" />-->
         <q-separator dark vertical />
-        <NuxtLink v-slot="{ navigate }" custom to="/admin">
-          <q-btn stretch flat label="admin" no-caps @click="navigate" />
+        <NuxtLink v-slot="{ navigate }" custom to="/TBD">
+          <q-btn stretch flat label="TBD" no-caps />
         </NuxtLink>
         <q-separator dark vertical />
 
         <q-separator dark vertical />
         <!-- <ClientOnly> -->
         <NuxtLink v-if="isAuthenticated" v-slot="{ navigate }" custom to="/tbd">
-          <q-btn stretch flat :label="currentUser?.token" />
+          <q-btn stretch flat :label="currentUser?.email" />
         </NuxtLink>
         <NuxtLink
           v-if="!isAuthenticated"
